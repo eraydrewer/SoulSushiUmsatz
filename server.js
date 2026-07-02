@@ -6,11 +6,13 @@ const XLSX = require("xlsx");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS für GitHub Pages erlauben
 app.use(cors({
     origin: "https://eraydrewer.github.io",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"]
 }));
+
 app.use(express.json());
 
 const MANAGER_PASSWORD = "SoulChef2026";
