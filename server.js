@@ -6,7 +6,11 @@ const XLSX = require("xlsx");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: "https://eraydrewer.github.io",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
 
 const MANAGER_PASSWORD = "SoulChef2026";
