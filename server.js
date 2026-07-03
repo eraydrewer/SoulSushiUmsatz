@@ -515,93 +515,71 @@ async function loadStats(){
         .sort((a,b) => b[1].menge - a[1].menge);
 
     const startUmsatz = 16000000;
-const gesamtMitStart = startUmsatz + data.totalRevenue;
+    const gesamtMitStart = startUmsatz + data.totalRevenue;
 
-document.getElementById("cardRevenue").innerText = gesamtMitStart.toLocaleString("de-DE") + "€";
+    document.getElementById("cardRevenue").innerText =
+        gesamtMitStart.toLocaleString("de-DE") + "€";
+
     document.getElementById("cardOrders").innerText = data.totalOrders;
     document.getElementById("cardEmployee").innerText = employeeEntries[0] ? employeeEntries[0][0] : "-";
     document.getElementById("cardProduct").innerText = productEntries[0] ? productEntries[0][0] : "-";
 
     const employees = document.getElementById("employees");
-employees.innerHTML = "";
+    employees.innerHTML = "";
 
-employeeEntries.forEach(([name, info], index) => {
-    const medal =
-        index === 0 ? "🥇" :
-        index === 1 ? "🥈" :
-        index === 2 ? "🥉" :
-        index + 1;
+    employeeEntries.forEach(([name, info], index) => {
+        const medal =
+            index === 0 ? "🥇" :
+            index === 1 ? "🥈" :
+            index === 2 ? "🥉" :
+            index + 1;
 
-    employees.innerHTML += \`
-        <tr>
-            <td class="rank">\${medal}</td>
-            <td>\${name}</td>
-            <td>\${info.bestellungen}</td>
-            <td>\${info.umsatz}€</td>
-        </tr>
-    \`;
-});
+        employees.innerHTML += \`
+            <tr>
+                <td class="rank">\${medal}</td>
+                <td>\${name}</td>
+                <td>\${info.bestellungen}</td>
+                <td>\${info.umsatz}€</td>
+            </tr>
+        \`;
+    });
 
-if(employeeEntries.length === 0){
-    employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
-}
+    if(employeeEntries.length === 0){
+        employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
+    }
 
-const employees = document.getElementById("employees");
-employees.innerHTML = "";
+    const products = document.getElementById("products");
+    products.innerHTML = "";
 
-employeeEntries.forEach(([name, info], index) => {
-    const medal =
-        index === 0 ? "🥇" :
-        index === 1 ? "🥈" :
-        index === 2 ? "🥉" :
-        index + 1;
+    productEntries.forEach(([name, info]) => {
+        products.innerHTML += \`
+            <tr>
+                <td>\${name}</td>
+                <td>\${info.menge}x</td>
+                <td>\${info.umsatz}€</td>
+            </tr>
+        \`;
+    });
 
-    employees.innerHTML += \`
-        <tr>
-            <td class="rank">\${medal}</td>
-            <td>\${name}</td>
-            <td>\${info.bestellungen}</td>
-            <td>\${info.umsatz}€</td>
-        </tr>
-    \`;
-});
+    if(productEntries.length === 0){
+        products.innerHTML = '<tr><td colspan="3" class="empty">Noch keine Produkte verkauft</td></tr>';
+    }
 
-if(employeeEntries.length === 0){
-    employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
-}
+    const chart = document.getElementById("chart");
+    chart.innerHTML = "";
 
-const products = document.getElementById("products");
-products.innerHTML = "";
+    const max = Math.max(...employeeEntries.map(e => e[1].umsatz), 1);
 
-productEntries.forEach(([name, info]) => {
-    products.innerHTML += \`
-        <tr>
-            <td>\${name}</td>
-            <td>\${info.menge}x</td>
-            <td>\${info.umsatz}€</td>
-        </tr>
-    \`;
-});
+    employeeEntries.forEach(([name, info]) => {
+        const width = (info.umsatz / max) * 100;
 
-if(productEntries.length === 0){
-    products.innerHTML = '<tr><td colspan="3" class="empty">Noch keine Produkte verkauft</td></tr>';
-}
-
-const chart = document.getElementById("chart");
-chart.innerHTML = "";
-
-const max = Math.max(...employeeEntries.map(e => e[1].umsatz), 1);
-
-employeeEntries.forEach(([name, info]) => {
-    const width = (info.umsatz / max) * 100;
-
-    chart.innerHTML += \`
-        <p><b>\${name}</b> - \${info.umsatz}€</p>
-        <div class="bar-wrap">
-            <div class="bar" style="width:\${width}%"></div>
-        </div>
-    \`;
-});
+        chart.innerHTML += \`
+            <p><b>\${name}</b> - \${info.umsatz}€</p>
+            <div class="bar-wrap">
+                <div class="bar" style="width:\${width}%"></div>
+            </div>
+        \`;
+    });
 }
 
 function exportExcel(){
