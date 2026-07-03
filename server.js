@@ -519,26 +519,93 @@ async function loadStats(){
     document.getElementById("cardProduct").innerText = productEntries[0] ? productEntries[0][0] : "-";
 
     const employees = document.getElementById("employees");
-    employees.innerHTML = "";
+employees.innerHTML = "";
+
+if(employeeEntries.length === 0){
+    employees.innerHTML = `
+        <tr>
+            <td colspan="4" class="empty">
+                Noch keine Daten vorhanden
+            </td>
+        </tr>
+    `;
+}else{
+
+    const maxRevenue = Math.max(...employeeEntries.map(e => e[1].umsatz),1);
 
     employeeEntries.forEach(([name, info], index) => {
-        const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1;
 
-        employees.innerHTML += \`
+        const medal =
+            index === 0 ? "🥇" :
+            index === 1 ? "🥈" :
+            index === 2 ? "🥉" :
+            (index + 1) + ".";
+
+        const width = (info.umsatz / maxRevenue) * 100;
+
+        employees.innerHTML += `
             <tr>
-                <td class="rank">\${medal}</td>
-                <td>\${name}</td>
-                <td>\${info.bestellungen}</td>
-                <td>\${info.umsatz}€</td>
+                <td colspan="4" style="padding:18px 10px;">
+                    <div style="
+                        background:#11181d;
+                        border:1px solid rgba(57,196,170,.25);
+                        border-radius:18px;
+                        padding:18px;
+                        box-shadow:0 8px 20px rgba(0,0,0,.25);
+                    ">
+
+                        <div style="
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:center;
+                            margin-bottom:10px;
+                        ">
+
+                            <div style="font-size:22px;font-weight:bold;">
+                                ${medal} ${name}
+                            </div>
+
+                            <div style="
+                                color:#39c4aa;
+                                font-size:22px;
+                                font-weight:bold;
+                            ">
+                                ${info.umsatz}€
+                            </div>
+
+                        </div>
+
+                        <div style="
+                            color:#9aa7aa;
+                            margin-bottom:12px;
+                        ">
+                            📦 ${info.bestellungen} Bestellungen
+                        </div>
+
+                        <div style="
+                            background:#0a1013;
+                            height:14px;
+                            border-radius:999px;
+                            overflow:hidden;
+                        ">
+                            <div style="
+                                width:${width}%;
+                                height:100%;
+                                background:linear-gradient(90deg,#39c4aa,#7fffe6);
+                                border-radius:999px;
+                                transition:.6s;
+                            "></div>
+                        </div>
+
+                    </div>
+                </td>
             </tr>
-        \`;
+        `;
     });
 
-    if(employeeEntries.length === 0){
-        employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
-    }
+}
 
-    const products = document.getElementById("products");
+const products = document.getElementById("products");
     products.innerHTML = "";
 
     productEntries.forEach(([name, info]) => {
