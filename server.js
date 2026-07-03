@@ -95,7 +95,6 @@ app.post("/order", async (req, res) => {
 
     res.json({ success: true });
 });
-});
 
 function filterOrders(orders, filter) {
     const now = new Date();
