@@ -216,101 +216,281 @@ app.get("/dashboard", (req, res) => {
 <meta charset="UTF-8">
 <title>SoulSushi Dashboard</title>
 <style>
+*{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
-    padding:30px;
-    background:#090b0d;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top left, rgba(57,196,170,0.25), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255,140,0,0.12), transparent 30%),
+        linear-gradient(135deg,#050607,#0b1114,#050607);
     color:white;
-    font-family:Arial;
+    font-family:Arial, sans-serif;
+    padding:35px;
 }
-.box{
-    background:#15191d;
-    border:1px solid #273038;
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:20px;
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
 }
-h1{color:#39c4aa;}
-button, select, input{
-    padding:12px;
-    border-radius:10px;
-    border:none;
-    margin:5px;
+
+.header h1{
+    margin:0;
+    font-size:38px;
+    color:#39c4aa;
 }
-button{
-    background:#39c4aa;
-    color:white;
+
+.header p{
+    margin:6px 0 0;
+    color:#9aa7aa;
+}
+
+.live{
+    background:rgba(57,196,170,0.15);
+    border:1px solid #39c4aa;
+    color:#39c4aa;
+    padding:12px 20px;
+    border-radius:999px;
     font-weight:bold;
-    cursor:pointer;
+    box-shadow:0 0 25px rgba(57,196,170,0.25);
 }
+
+.panel{
+    background:rgba(18,24,28,0.82);
+    border:1px solid rgba(57,196,170,0.22);
+    border-radius:24px;
+    padding:22px;
+    margin-bottom:24px;
+    box-shadow:0 18px 45px rgba(0,0,0,0.35);
+    backdrop-filter:blur(12px);
+}
+
+.controls{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+input, select{
+    background:#0b1114;
+    color:white;
+    border:1px solid #27383d;
+    padding:14px 16px;
+    border-radius:14px;
+    outline:none;
+    font-size:15px;
+}
+
+button{
+    background:linear-gradient(135deg,#39c4aa,#2cae97);
+    color:white;
+    border:none;
+    padding:14px 20px;
+    border-radius:14px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:15px;
+    box-shadow:0 10px 25px rgba(57,196,170,0.22);
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.card{
+    background:linear-gradient(145deg,rgba(21,28,33,0.95),rgba(10,14,17,0.95));
+    border:1px solid rgba(57,196,170,0.22);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 14px 35px rgba(0,0,0,0.35);
+}
+
+.card small{
+    color:#9aa7aa;
+    font-size:13px;
+}
+
+.card h2{
+    margin:12px 0 0;
+    font-size:28px;
+    color:white;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+}
+
+h2{
+    margin-top:0;
+    color:#39c4aa;
+}
+
 table{
     width:100%;
     border-collapse:collapse;
-    margin-top:15px;
 }
+
 td, th{
-    padding:12px;
-    border-bottom:1px solid #273038;
+    padding:14px 10px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
     text-align:left;
 }
+
+th{
+    color:#9aa7aa;
+    font-size:13px;
+    text-transform:uppercase;
+}
+
+.rank{
+    font-weight:bold;
+    color:#39c4aa;
+}
+
+.bar-wrap{
+    background:#0b1114;
+    border-radius:999px;
+    overflow:hidden;
+    height:18px;
+    margin-top:8px;
+}
+
 .bar{
-    background:#39c4aa;
-    height:22px;
-    border-radius:10px;
+    height:100%;
+    background:linear-gradient(90deg,#39c4aa,#7fffe6);
+    border-radius:999px;
+    animation:grow 0.8s ease;
+}
+
+@keyframes grow{
+    from{width:0;}
+}
+
+.empty{
+    color:#9aa7aa;
+    padding:15px 0;
+}
+
+@media(max-width:900px){
+    .cards{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:600px){
+    body{
+        padding:18px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
 }
 </style>
 </head>
 <body>
 
-<h1>🍣 SoulSushi Management Dashboard</h1>
-
-<div class="box">
-    <input type="password" id="password" placeholder="Manager Passwort">
-    <select id="filter">
-        <option value="day">Tagesumsatz</option>
-        <option value="week">Wochenumsatz</option>
-        <option value="month">Monatsumsatz</option>
-        <option value="all">Gesamtumsatz</option>
-    </select>
-    <button onclick="loadStats()">Anzeigen</button>
-    <button onclick="exportExcel()">Excel Export</button>
+<div class="header">
+    <div>
+        <h1>SoulSushi</h1>
+        <p>Management Dashboard</p>
+    </div>
+    <div class="live">🟢 LIVE</div>
 </div>
 
-<div class="box">
-    <h2>Gesamt</h2>
-    <p id="gesamt">Noch keine Daten geladen</p>
+<div class="panel">
+    <div class="controls">
+        <input type="password" id="password" placeholder="Manager Passwort">
+        <select id="filter">
+            <option value="day">Heute</option>
+            <option value="week">Diese Woche</option>
+            <option value="month">Dieser Monat</option>
+            <option value="all">Gesamt</option>
+        </select>
+        <button onclick="loadStats()">Statistik laden</button>
+        <button onclick="exportExcel()">Excel Export</button>
+    </div>
 </div>
 
-<div class="box">
-    <h2>Mitarbeiter Umsatz</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Mitarbeiter</th>
-                <th>Bestellungen</th>
-                <th>Umsatz</th>
-            </tr>
-        </thead>
-        <tbody id="employees"></tbody>
-    </table>
+<div class="cards">
+    <div class="card">
+        <small>💰 Gesamtumsatz</small>
+        <h2 id="cardRevenue">0€</h2>
+    </div>
+
+    <div class="card">
+        <small>📦 Bestellungen</small>
+        <h2 id="cardOrders">0</h2>
+    </div>
+
+    <div class="card">
+        <small>👨‍🍳 Bester Mitarbeiter</small>
+        <h2 id="cardEmployee">-</h2>
+    </div>
+
+    <div class="card">
+        <small>🍣 Top Produkt</small>
+        <h2 id="cardProduct">-</h2>
+    </div>
 </div>
 
-<div class="box">
-    <h2>Produkt Verkäufe</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Produkt</th>
-                <th>Verkauft</th>
-                <th>Umsatz</th>
-            </tr>
-        </thead>
-        <tbody id="products"></tbody>
-    </table>
+<div class="grid">
+    <div class="panel">
+        <h2>🏆 Mitarbeiter Ranking</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rang</th>
+                    <th>Mitarbeiter</th>
+                    <th>Bestellungen</th>
+                    <th>Umsatz</th>
+                </tr>
+            </thead>
+            <tbody id="employees"></tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2>🍣 Produkt Ranking</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produkt</th>
+                    <th>Verkauft</th>
+                    <th>Umsatz</th>
+                </tr>
+            </thead>
+            <tbody id="products"></tbody>
+        </table>
+    </div>
 </div>
 
-<div class="box">
-    <h2>Diagramm Mitarbeiter Umsatz</h2>
+<div class="panel">
+    <h2>📊 Umsatz Diagramm</h2>
     <div id="chart"></div>
 </div>
 
@@ -328,19 +508,26 @@ async function loadStats(){
 
     const data = await res.json();
 
-    document.getElementById("gesamt").innerHTML =
-        "Gesamtumsatz: <b>" + data.totalRevenue + "€</b><br>" +
-        "Bestellungen: <b>" + data.totalOrders + "</b>";
+    const employeeEntries = Object.entries(data.employees)
+        .sort((a,b) => b[1].umsatz - a[1].umsatz);
+
+    const productEntries = Object.entries(data.products)
+        .sort((a,b) => b[1].menge - a[1].menge);
+
+    document.getElementById("cardRevenue").innerText = data.totalRevenue + "€";
+    document.getElementById("cardOrders").innerText = data.totalOrders;
+    document.getElementById("cardEmployee").innerText = employeeEntries[0] ? employeeEntries[0][0] : "-";
+    document.getElementById("cardProduct").innerText = productEntries[0] ? productEntries[0][0] : "-";
 
     const employees = document.getElementById("employees");
     employees.innerHTML = "";
 
-    const employeeEntries = Object.entries(data.employees)
-        .sort((a,b) => b[1].umsatz - a[1].umsatz);
+    employeeEntries.forEach(([name, info], index) => {
+        const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1;
 
-    employeeEntries.forEach(([name, info]) => {
         employees.innerHTML += \`
             <tr>
+                <td class="rank">\${medal}</td>
                 <td>\${name}</td>
                 <td>\${info.bestellungen}</td>
                 <td>\${info.umsatz}€</td>
@@ -348,20 +535,26 @@ async function loadStats(){
         \`;
     });
 
+    if(employeeEntries.length === 0){
+        employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
+    }
+
     const products = document.getElementById("products");
     products.innerHTML = "";
 
-    Object.entries(data.products)
-        .sort((a,b) => b[1].menge - a[1].menge)
-        .forEach(([name, info]) => {
-            products.innerHTML += \`
-                <tr>
-                    <td>\${name}</td>
-                    <td>\${info.menge}x</td>
-                    <td>\${info.umsatz}€</td>
-                </tr>
-            \`;
-        });
+    productEntries.forEach(([name, info]) => {
+        products.innerHTML += \`
+            <tr>
+                <td>\${name}</td>
+                <td>\${info.menge}x</td>
+                <td>\${info.umsatz}€</td>
+            </tr>
+        \`;
+    });
+
+    if(productEntries.length === 0){
+        products.innerHTML = '<tr><td colspan="3" class="empty">Noch keine Produkte verkauft</td></tr>';
+    }
 
     const chart = document.getElementById("chart");
     chart.innerHTML = "";
@@ -372,8 +565,10 @@ async function loadStats(){
         const width = (info.umsatz / max) * 100;
 
         chart.innerHTML += \`
-            <p>\${name} - \${info.umsatz}€</p>
-            <div class="bar" style="width:\${width}%"></div>
+            <p><b>\${name}</b> - \${info.umsatz}€</p>
+            <div class="bar-wrap">
+                <div class="bar" style="width:\${width}%"></div>
+            </div>
         \`;
     });
 }
