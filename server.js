@@ -522,13 +522,7 @@ async function loadStats(){
 employees.innerHTML = "";
 
 if(employeeEntries.length === 0){
-    employees.innerHTML = `
-        <tr>
-            <td colspan="4" class="empty">
-                Noch keine Daten vorhanden
-            </td>
-        </tr>
-    `;
+    employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
 }else{
 
     const maxRevenue = Math.max(...employeeEntries.map(e => e[1].umsatz),1);
