@@ -543,37 +543,29 @@ if(employeeEntries.length === 0){
     employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
 }
 
-const employeeCards = document.getElementById("employeeCards");
-employeeCards.innerHTML = "";
-
-const maxRevenue = Math.max(...employeeEntries.map(e => e[1].umsatz), 1);
+const employees = document.getElementById("employees");
+employees.innerHTML = "";
 
 employeeEntries.forEach(([name, info], index) => {
     const medal =
         index === 0 ? "🥇" :
         index === 1 ? "🥈" :
         index === 2 ? "🥉" :
-        index + 1 + ".";
+        index + 1;
 
-    const width = (info.umsatz / maxRevenue) * 100;
-
-    employeeCards.innerHTML += \`
+    employees.innerHTML += \`
         <tr>
-            <td colspan="4">
-                <div style="background:#11181d;border:1px solid rgba(57,196,170,.25);border-radius:18px;padding:18px;margin-top:14px;">
-                    <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:bold;">
-                        <span>\${medal} \${name}</span>
-                        <span style="color:#39c4aa;">\${info.umsatz}€</span>
-                    </div>
-                    <div style="color:#9aa7aa;margin:10px 0;">📦 \${info.bestellungen} Bestellungen</div>
-                    <div style="background:#0a1013;height:14px;border-radius:999px;overflow:hidden;">
-                        <div style="width:\${width}%;height:100%;background:linear-gradient(90deg,#39c4aa,#7fffe6);border-radius:999px;"></div>
-                    </div>
-                </div>
-            </td>
+            <td class="rank">\${medal}</td>
+            <td>\${name}</td>
+            <td>\${info.bestellungen}</td>
+            <td>\${info.umsatz}€</td>
         </tr>
     \`;
 });
+
+if(employeeEntries.length === 0){
+    employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
+}
 
 const products = document.getElementById("products");
 products.innerHTML = "";
