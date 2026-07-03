@@ -612,6 +612,7 @@ function exportExcel(){
         "/export-excel?filter=" + filter + "&password=" + password;
 }
 
+loadStats();
 </script>
 
 </body>
