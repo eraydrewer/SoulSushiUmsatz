@@ -30,7 +30,7 @@ function saveOrders(orders) {
     fs.writeFileSync("orders.json", JSON.stringify(orders, null, 2));
 }
 
-app.post("/order", (req, res) => {
+app.post("/order", async (req, res) => {
     const { mitarbeiter, betrag, rabatt, bestellung } = req.body;
 
     const orders = loadOrders();
@@ -48,7 +48,53 @@ app.post("/order", (req, res) => {
 
     console.log("Neue Bestellung gespeichert:", mitarbeiter, betrag);
 
+    const itemsText = (bestellung || [])
+        .map(item => `• ${item.name} x${item.menge} = ${item.summe}€`)
+        .join("\n");
+
+    try {
+        await fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                embeds: [{
+                    title: "🍣 Neue SoulSushi Quittung",
+                    color: 0x39c4aa,
+                    fields: [
+                        {
+                            name: "👤 Mitarbeiter",
+                            value: mitarbeiter || "Unbekannt",
+                            inline: true
+                        },
+                        {
+                            name: "💸 Rabatt",
+                            value: `${rabatt || 0}%`,
+                            inline: true
+                        },
+                        {
+                            name: "🧾 Bestellung",
+                            value: itemsText || "Keine Produkte"
+                        },
+                        {
+                            name: "💰 Gesamt",
+                            value: `${betrag}€`,
+                            inline: true
+                        }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            })
+        });
+
+        console.log("Discord Quittung gesendet");
+    } catch (err) {
+        console.error("Discord Fehler:", err);
+    }
+
     res.json({ success: true });
+});
 });
 
 function filterOrders(orders, filter) {
