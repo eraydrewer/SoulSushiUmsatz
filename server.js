@@ -514,7 +514,10 @@ async function loadStats(){
     const productEntries = Object.entries(data.products)
         .sort((a,b) => b[1].menge - a[1].menge);
 
-    document.getElementById("cardRevenue").innerText = data.totalRevenue + "€";
+    const startUmsatz = 16000000;
+const gesamtMitStart = startUmsatz + data.totalRevenue;
+
+document.getElementById("cardRevenue").innerText = gesamtMitStart.toLocaleString("de-DE") + "€";
     document.getElementById("cardOrders").innerText = data.totalOrders;
     document.getElementById("cardEmployee").innerText = employeeEntries[0] ? employeeEntries[0][0] : "-";
     document.getElementById("cardProduct").innerText = productEntries[0] ? productEntries[0][0] : "-";
