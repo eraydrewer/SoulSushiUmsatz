@@ -3,6 +3,8 @@ const cors = require("cors");
 const fs = require("fs");
 const XLSX = require("xlsx");
 
+const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1517721854809342222/-URchBn7bkaHkmRuZzQ5ztiwV1ISPzNJQvQuLeheCXZuUNo0W-4nuh4WSLjuaoiJMgCS";
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
