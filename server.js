@@ -424,8 +424,7 @@ th{
 
 <div class="panel">
     <div class="controls">
-        <input type="password" id="password" placeholder="Manager Passwort">
-        <select id="filter">
+      <select id="filter">
             <option value="day">Heute</option>
             <option value="week">Diese Woche</option>
             <option value="month">Dieser Monat</option>
@@ -496,7 +495,7 @@ th{
 
 <script>
 async function loadStats(){
-    const password = document.getElementById("password").value;
+    const password = "SoulChef2026";
     const filter = document.getElementById("filter").value;
 
     const res = await fetch("/api/stats?filter=" + filter + "&password=" + password);
