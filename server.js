@@ -419,7 +419,12 @@ th{
         <h1>SoulSushi</h1>
         <p>Management Dashboard</p>
     </div>
+    <div>
     <div class="live">🟢 LIVE</div>
+    <p id="lastUpdate" style="color:#9aa7aa;text-align:right;margin-top:8px;">
+        Wird geladen...
+    </p>
+</div>
 </div>
 
 <div class="panel">
@@ -430,7 +435,6 @@ th{
             <option value="month">Dieser Monat</option>
             <option value="all">Gesamt</option>
         </select>
-        <button onclick="loadStats()">Statistik laden</button>
         <button onclick="exportExcel()">Excel Export</button>
     </div>
 </div>
@@ -590,7 +594,19 @@ function exportExcel(){
         "/export-excel?filter=" + filter + "&password=" + password;
 }
 
-loadStats();
+function updateTime(){
+    const now = new Date();
+    document.getElementById("lastUpdate").innerText =
+        "Letzte Aktualisierung: " + now.toLocaleTimeString("de-DE");
+}
+
+async function liveUpdate(){
+    await loadStats();
+    updateTime();
+}
+
+liveUpdate();
+setInterval(liveUpdate, 10000);
 </script>
 
 </body>
