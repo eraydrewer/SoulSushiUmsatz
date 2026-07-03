@@ -470,6 +470,7 @@ th{
                 </tr>
             </thead>
             <tbody id="employees"></tbody>
+            <tbody id="employeeCards"></tbody>
         </table>
     </div>
 
@@ -542,58 +543,76 @@ if(employeeEntries.length === 0){
     employees.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Daten vorhanden</td></tr>';
 }
 
+const employeeCards = document.getElementById("employeeCards");
+employeeCards.innerHTML = "";
+
+const maxRevenue = Math.max(...employeeEntries.map(e => e[1].umsatz), 1);
+
+employeeEntries.forEach(([name, info], index) => {
+    const medal =
+        index === 0 ? "🥇" :
+        index === 1 ? "🥈" :
+        index === 2 ? "🥉" :
+        index + 1 + ".";
+
+    const width = (info.umsatz / maxRevenue) * 100;
+
+    employeeCards.innerHTML += \`
+        <tr>
+            <td colspan="4">
+                <div style="background:#11181d;border:1px solid rgba(57,196,170,.25);border-radius:18px;padding:18px;margin-top:14px;">
+                    <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:bold;">
+                        <span>\${medal} \${name}</span>
+                        <span style="color:#39c4aa;">\${info.umsatz}€</span>
+                    </div>
+                    <div style="color:#9aa7aa;margin:10px 0;">📦 \${info.bestellungen} Bestellungen</div>
+                    <div style="background:#0a1013;height:14px;border-radius:999px;overflow:hidden;">
+                        <div style="width:\${width}%;height:100%;background:linear-gradient(90deg,#39c4aa,#7fffe6);border-radius:999px;"></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    \`;
+});
+
 const products = document.getElementById("products");
-    products.innerHTML = "";
+products.innerHTML = "";
 
-    productEntries.forEach(([name, info]) => {
-        products.innerHTML += \`
-            <tr>
-                <td>\${name}</td>
-                <td>\${info.menge}x</td>
-                <td>\${info.umsatz}€</td>
-            </tr>
-        \`;
-    });
+productEntries.forEach(([name, info]) => {
+    products.innerHTML += \`
+        <tr>
+            <td>\${name}</td>
+            <td>\${info.menge}x</td>
+            <td>\${info.umsatz}€</td>
+        </tr>
+    \`;
+});
 
-    if(productEntries.length === 0){
-        products.innerHTML = '<tr><td colspan="3" class="empty">Noch keine Produkte verkauft</td></tr>';
-    }
+if(productEntries.length === 0){
+    products.innerHTML = '<tr><td colspan="3" class="empty">Noch keine Produkte verkauft</td></tr>';
+}
 
-    const chart = document.getElementById("chart");
-    chart.innerHTML = "";
+const chart = document.getElementById("chart");
+chart.innerHTML = "";
 
-    const max = Math.max(...employeeEntries.map(e => e[1].umsatz), 1);
+const max = Math.max(...employeeEntries.map(e => e[1].umsatz), 1);
 
-    employeeEntries.forEach(([name, info]) => {
-        const width = (info.umsatz / max) * 100;
+employeeEntries.forEach(([name, info]) => {
+    const width = (info.umsatz / max) * 100;
 
-        chart.innerHTML += \`
-            <p><b>\${name}</b> - \${info.umsatz}€</p>
-            <div class="bar-wrap">
-                <div class="bar" style="width:\${width}%"></div>
-            </div>
-        \`;
-    });
+    chart.innerHTML += \`
+        <p><b>\${name}</b> - \${info.umsatz}€</p>
+        <div class="bar-wrap">
+            <div class="bar" style="width:\${width}%"></div>
+        </div>
+    \`;
+});
 }
 
 function exportExcel(){
-    const password = document.getElementById("password").value;
+    const password = "SoulChef2026";
     const filter = document.getElementById("filter").value;
 
     window.location.href =
         "/export-excel?filter=" + filter + "&password=" + password;
 }
-</script>
-
-</body>
-</html>
-    `);
-});
-
-app.get("/", (req, res) => {
-    res.send("SoulSushi Umsatz Server läuft ✅");
-});
-
-app.listen(PORT, () => {
-    console.log("Server läuft auf http://localhost:" + PORT);
-});
