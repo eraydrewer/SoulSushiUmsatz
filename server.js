@@ -616,3 +616,18 @@ function exportExcel(){
     window.location.href =
         "/export-excel?filter=" + filter + "&password=" + password;
 }
+
+</script>
+
+</body>
+</html>
+    `);
+});
+
+app.get("/", (req, res) => {
+    res.send("SoulSushi Umsatz Server läuft ✅");
+});
+
+app.listen(PORT, () => {
+    console.log("Server läuft auf http://localhost:" + PORT);
+});
