@@ -357,7 +357,6 @@ td, th{
 <h1>🍣 SoulSushi Management Dashboard</h1>
 
 <div class="box">
-    <input type="password" id="password" placeholder="Manager Passwort">
     <select id="filter">
         <option value="day">Tagesumsatz</option>
         <option value="week">Wochenumsatz</option>
