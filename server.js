@@ -488,7 +488,7 @@ document.getElementById("gesamtProdukte").innerHTML =
                 <tr>
                     <td>\${name}</td>
                     <td>\${info.menge}x</td>
-                    <td>${Number(info.umsatz).toLocaleString("de-DE")} €</td>
+                   <td>\${Number(info.umsatz).toLocaleString("de-DE")} €</td>
                 </tr>
             \`;
         });
