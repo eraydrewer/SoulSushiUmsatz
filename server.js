@@ -392,13 +392,12 @@ td, th{
 
 <script>
 async function loadStats(){
-    const password = document.getElementById("password").value;
     const filter = document.getElementById("filter").value;
 
-    const res = await fetch("/api/stats?filter=" + filter + "&password=" + password);
+    const res = await fetch("/api/stats?filter=" + filter);
 
     if(!res.ok){
-        alert("Falsches Passwort oder kein Zugriff");
+        alert("Fehler beim Laden der Daten");
         return;
     }
 
@@ -468,13 +467,21 @@ async function loadStats(){
     });
 }
 
-function exportExcel(){
-    const password = document.getElementById("password").value;
+function exportExcel(){ 
     const filter = document.getElementById("filter").value;
 
     window.location.href =
-        "/export-excel?filter=" + filter + "&password=" + password;
+        "/export-excel?filter=" + filter;
 }
+
+// Direkt beim Öffnen laden
+loadStats();
+
+// Danach alle 5 Sekunden aktualisieren
+setInterval(() => {
+    loadStats();
+}, 5000);
+
 </script>
 
 </body>
