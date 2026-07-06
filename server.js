@@ -149,12 +149,12 @@ async function getOrders(filter) {
 }
 
 function buildStats(orders) {
-    let totalRevenue = 0;
+    let totalRevenue = 17337095;
     const employees = {};
     const products = {};
 
     orders.forEach(order => {
-        const betrag = Number(order.betrag);
+        const betrag = Number(order.betrag) || 0;
         totalRevenue += betrag;
 
         if (!employees[order.mitarbeiter]) {
@@ -405,7 +405,7 @@ async function loadStats(){
     const data = await res.json();
 
     document.getElementById("gesamt").innerHTML =
-        "Gesamtumsatz: <b>" + data.totalRevenue.toFixed(2) + "€</b><br>" +
+        Number(data.totalRevenue).toLocaleString("de-DE") + " €"
         "Bestellungen: <b>" + data.totalOrders + "</b>";
 
     const employees = document.getElementById("employees");
