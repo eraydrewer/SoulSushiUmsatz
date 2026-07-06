@@ -73,7 +73,7 @@ if (DISCORD_WEBHOOK_URL) {
     const text = (bestellung || []).map(item =>
         `• ${item.name} x${item.menge} = ${item.summe}€`
     ).join("\n");
-
+    
     await fetch(DISCORD_WEBHOOK_URL, {
     method: "POST",
     headers: {
@@ -107,7 +107,7 @@ if (DISCORD_WEBHOOK_URL) {
         }]
     })
 });
-
+}
 res.json({ success: true });
 
       } catch (err) {
