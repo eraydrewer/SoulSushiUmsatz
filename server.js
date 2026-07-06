@@ -198,14 +198,6 @@ function buildStats(orders) {
 app.get("/api/stats", async (req, res) => {
     try {
         const filter = req.query.filter || "day";
-        const password = req.query.password;
-
-        if (password !== MANAGER_PASSWORD) {
-            return res.status(403).json({
-                success: false,
-                message: "Falsches Passwort"
-            });
-        }
 
         const orders = await getOrders(filter);
         res.json(buildStats(orders));
