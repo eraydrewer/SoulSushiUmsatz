@@ -451,9 +451,17 @@ async function loadStats(){
 
     const data = await res.json();
 
-    document.getElementById("gesamt").innerHTML =
-        Number(data.totalRevenue).toLocaleString("de-DE") + " €"
-        "Bestellungen: <b>" + data.totalOrders + "</b>";
+    document.getElementById("gesamtUmsatz").innerHTML =
+    Number(data.totalRevenue).toLocaleString("de-DE") + " €";
+
+document.getElementById("gesamtBestellungen").innerHTML =
+    data.totalOrders;
+
+document.getElementById("gesamtMitarbeiter").innerHTML =
+    Object.keys(data.employees).length;
+
+document.getElementById("gesamtProdukte").innerHTML =
+    Object.keys(data.products).length;
 
     const employees = document.getElementById("employees");
     employees.innerHTML = "";
@@ -481,7 +489,7 @@ async function loadStats(){
                 <tr>
                     <td>\${name}</td>
                     <td>\${info.menge}x</td>
-                    <td>\${info.umsatz.toFixed(2)}€</td>
+                    <td>${Number(info.umsatz).toLocaleString("de-DE")} €</td>
                 </tr>
             \`;
         });
