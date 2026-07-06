@@ -180,8 +180,7 @@ app.get("/api/stats", async (req, res) => {
 app.get("/export-excel", async (req, res) => {
     try {
         const filter = req.query.filter || "all";
-        }
-
+       
         const orders = await getOrders(filter);
         const rows = [];
 
