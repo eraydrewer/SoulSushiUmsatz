@@ -287,6 +287,37 @@ body{
     padding:20px;
     margin-bottom:20px;
 }
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:20px;
+}
+
+.stat-card{
+    background:#15191d;
+    border:1px solid #273038;
+    border-radius:18px;
+    padding:22px;
+    transition:0.3s;
+}
+
+.stat-card:hover{
+    transform:translateY(-4px);
+    border-color:#39c4aa;
+}
+
+.stat-card span{
+    display:block;
+    color:#8e9aa5;
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.stat-card strong{
+    font-size:30px;
+    color:#39c4aa;
+}
 h1{color:#39c4aa;}
 button, select, input{
     padding:12px;
@@ -337,9 +368,26 @@ td, th{
     <button onclick="exportExcel()">Excel Export</button>
 </div>
 
-<div class="box">
-    <h2>Gesamt</h2>
-    <p id="gesamt">Noch keine Daten geladen</p>
+<div class="stats-grid">
+    <div class="stat-card">
+        <span>💰 Gesamtumsatz</span>
+        <strong id="gesamtUmsatz">0 €</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>📦 Bestellungen</span>
+        <strong id="gesamtBestellungen">0</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>👨‍🍳 Mitarbeiter</span>
+        <strong id="gesamtMitarbeiter">0</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>🍣 Produkte</span>
+        <strong id="gesamtProdukte">0</strong>
+    </div>
 </div>
 
 <div class="box">
