@@ -98,9 +98,7 @@ ${text}
 
 res.json({ success: true });
 
-        res.json({ success: true });
-
-    } catch (err) {
+      } catch (err) {
         console.error("Fehler beim Speichern:", err);
         res.status(500).json({
             success: false,
