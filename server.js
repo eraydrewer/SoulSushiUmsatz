@@ -3,6 +3,8 @@ const cors = require("cors");
 const XLSX = require("xlsx");
 const { Pool } = require("pg");
 
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -65,6 +67,36 @@ app.post("/order", async (req, res) => {
         );
 
         console.log("Neue Bestellung gespeichert:", mitarbeiter, betrag);
+
+if (DISCORD_WEBHOOK_URL) {
+
+    const text = (bestellung || []).map(item =>
+        `• ${item.name} x${item.menge} = ${item.summe}€`
+    ).join("\n");
+
+    await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            content:
+`🍣 **Neue SoulSushi Quittung**
+
+👤 Mitarbeiter: **${mitarbeiter}**
+
+🧾 Bestellung:
+${text}
+
+🏷️ Rabatt: **${rabatt || 0}%**
+
+💰 Gesamt: **${betrag}€**`
+        })
+    });
+
+}
+
+res.json({ success: true });
 
         res.json({ success: true });
 
