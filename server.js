@@ -180,10 +180,6 @@ app.get("/api/stats", async (req, res) => {
 app.get("/export-excel", async (req, res) => {
     try {
         const filter = req.query.filter || "all";
-        const password = req.query.password;
-
-        if (password !== MANAGER_PASSWORD) {
-            return res.status(403).send("Falsches Passwort");
         }
 
         const orders = await getOrders(filter);
