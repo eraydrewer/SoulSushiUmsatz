@@ -79,22 +79,33 @@ if (DISCORD_WEBHOOK_URL) {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-            content:
-`🍣 **Neue SoulSushi Quittung**
-
-👤 Mitarbeiter: **${mitarbeiter}**
-
-🧾 Bestellung:
-${text}
-
-🏷️ Rabatt: **${rabatt || 0}%**
-
-💰 Gesamt: **${betrag}€**`
-        })
-    });
-
-}
+body: JSON.stringify({
+    embeds: [{
+        title: "🍣 Neue SoulSushi Quittung",
+        color: 3916970,
+        fields: [
+            {
+                name: "👤 Mitarbeiter",
+                value: mitarbeiter,
+                inline: true
+            },
+            {
+                name: "💸 Rabatt",
+                value: `${rabatt || 0}%`,
+                inline: true
+            },
+            {
+                name: "🧾 Bestellung",
+                value: text || "Keine Produkte"
+            },
+            {
+                name: "💰 Gesamt",
+                value: `**${betrag}€**`
+            }
+        ],
+        timestamp: new Date().toISOString()
+    }]
+});
 
 res.json({ success: true });
 
