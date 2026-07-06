@@ -100,7 +100,7 @@ if (DISCORD_WEBHOOK_URL) {
                 },
                 {
                     name: "💰 Gesamt",
-                    value: `**${betrag}€**`
+                    value: `${betrag}€`
                 }
             ],
             timestamp: new Date().toISOString()
