@@ -474,24 +474,6 @@ td, th{
 </div>
 
 <div class="box">
-    <h2>📦 Bestand verwalten</h2>
-
-    <input id="stockProdukt" placeholder="Produktname z.B. Cola">
-    <input id="stockBestand" type="number" placeholder="Bestand z.B. 100">
-    <button onclick="saveStock()">Bestand speichern</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Produkt</th>
-                <th>Aktueller Bestand</th>
-            </tr>
-        </thead>
-        <tbody id="stockList"></tbody>
-    </table>
-</div>
-
-<div class="box">
     <h2>Mitarbeiter Umsatz</h2>
     <table>
         <thead>
@@ -517,6 +499,22 @@ td, th{
             </tr>
         </thead>
         <tbody id="products"></tbody>
+    </table>
+</div>
+
+<div class="box">
+    <h2>📦 Bestand verwalten</h2>
+    <p class="small">Admin-Bereich öffnen, Bestand ändern und speichern.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produkt</th>
+                <th>Bestand</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody id="stockList"></tbody>
     </table>
 </div>
 
@@ -603,30 +601,50 @@ async function loadStock(){
     const stock = await res.json();
     const stockList = document.getElementById("stockList");
 
+    const alleProdukte = [
+        "Nigiri Sushi",
+        "Maki Sushi",
+        "Sashimi Sushi",
+        "Chirashi Sushi",
+        "Inari Sushi",
+        "Rahmen",
+        "Okonomiyaki",
+        "Hühnchennudeln",
+        "Donburi",
+        "Grüntee",
+        "Litschi Limo",
+        "Bananensaft",
+        "Ingwer Limo",
+        "Schokoerdbeere",
+        "Mochi",
+        "Softeis Schokolade",
+        "Softeis Erdbeere",
+        "Softeis Vanille"
+    ];
+
     stockList.innerHTML = "";
 
-    stock.forEach(item => {
+    alleProdukte.forEach(produkt => {
+        const found = stock.find(item => item.produkt === produkt);
+        const bestand = found ? found.bestand : 0;
+
         stockList.innerHTML +=
             "<tr>" +
-                "<td>" + item.produkt + "</td>" +
-                "<td>" + item.bestand + "x</td>" +
+                "<td>" + produkt + "</td>" +
+                "<td><input id='stock_" + produkt.replaceAll(" ", "_") + "' type='number' value='" + bestand + "'></td>" +
+                "<td><button onclick='saveStockDirect(" + JSON.stringify(produkt) + ")'>Speichern</button></td>" +
             "</tr>";
     });
 }
 
-async function saveStock(){
+async function saveStockDirect(produkt){
     if(!adminUnlocked){
         alert("Bitte zuerst Admin-Bereich öffnen.");
         return;
     }
 
-    const produkt = document.getElementById("stockProdukt").value.trim();
-    const bestand = document.getElementById("stockBestand").value;
-
-    if(!produkt){
-        alert("Bitte Produktname eingeben.");
-        return;
-    }
+    const inputId = "stock_" + produkt.replaceAll(" ", "_");
+    const bestand = document.getElementById(inputId).value;
 
     const res = await fetch("/api/admin/set-stock", {
         method: "POST",
@@ -634,11 +652,22 @@ async function saveStock(){
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            password: adminPassword,
+            password: adminPassword.trim(),
             produkt: produkt,
             bestand: bestand
         })
     });
+
+    const data = await res.json();
+
+    if(!res.ok){
+        alert(data.message || "Fehler beim Speichern");
+        return;
+    }
+
+    alert(produkt + " Bestand gespeichert ✅");
+    loadStock();
+}
 
     const data = await res.json();
 
