@@ -629,11 +629,11 @@ async function loadStock(){
         const bestand = found ? found.bestand : 0;
 
         stockList.innerHTML +=
-            "<tr>" +
-                "<td>" + produkt + "</td>" +
-                "<td><input id='stock_" + produkt.replaceAll(" ", "_") + "' type='number' value='" + bestand + "'></td>" +
-                "<td><button onclick='saveStockDirect(" + JSON.stringify(produkt) + ")'>Speichern</button></td>" +
-            "</tr>";
+    "<tr>" +
+        "<td>" + produkt + "</td>" +
+        "<td><input id='stock_" + produkt.replace(/ /g, "_") + "' type='number' value='" + bestand + "'></td>" +
+        "<td><button onclick='saveStockDirect(" + JSON.stringify(produkt) + ")'>Speichern</button></td>" +
+    "</tr>";
     });
 }
 
@@ -643,7 +643,7 @@ async function saveStockDirect(produkt){
         return;
     }
 
-    const inputId = "stock_" + produkt.replaceAll(" ", "_");
+    const inputId = "stock_" + produkt.replace(/ /g, "_");
     const bestand = document.getElementById(inputId).value;
 
     const res = await fetch("/api/admin/set-stock", {
