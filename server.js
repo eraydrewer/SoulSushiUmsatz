@@ -855,9 +855,9 @@ async function sendWeeklyBonusReport() {
             [weekKey]
         );
 
-        if (alreadySent.rows.length > 0) {
-            return;
-        }
+       if (alreadySent.rows.length > 0) {
+    console.log("Bonus wurde schon gesendet, Test läuft trotzdem weiter ✅");
+}
 
         const result = await pool.query(`
             SELECT 
