@@ -104,7 +104,7 @@ if (DISCORD_WEBHOOK_URL) {
         `• ${item.name} x${item.menge} = ${item.summe}€`
     ).join("\n");
     
-    await fetch(BONUS_WEBHOOK_URL, {
+    await fetch(DISCORD_WEBHOOK_URL, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
