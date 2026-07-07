@@ -365,6 +365,7 @@ td, th{
     </select>
     <button onclick="loadStats()">Anzeigen</button>
     <button onclick="exportExcel()">Excel Export</button>
+    <button onclick="openAdmin()">Admin-Bereich</button>
 </div>
 
 <div class="stats-grid">
@@ -394,9 +395,10 @@ td, th{
     <table>
         <thead>
             <tr>
-                <th>Mitarbeiter</th>
-                <th>Bestellungen</th>
-                <th>Umsatz</th>
+            <th>Mitarbeiter</th>
+            <th>Bestellungen</th>
+            <th>Umsatz</th>
+            <th>Aktion</th>
             </tr>
         </thead>
         <tbody id="employees"></tbody>
@@ -438,6 +440,58 @@ td, th{
 </div>
 
 <script>
+
+let adminUnlocked = false;
+let adminPassword = "";
+
+function openAdmin(){
+    const pw = prompt("Admin-Passwort eingeben:");
+
+    if(!pw){
+        return;
+    }
+
+    adminPassword = pw;
+    adminUnlocked = true;
+
+    alert("Admin-Bereich aktiviert ✅");
+    loadStats();
+}
+
+async function deleteEmployee(name){
+    if(!adminUnlocked){
+        alert("Bitte zuerst Admin-Bereich öffnen.");
+        return;
+    }
+
+    const sicher = confirm("Mitarbeiter " + name + " wirklich komplett löschen? Alle Umsätze und Bestellungen werden gelöscht!");
+
+    if(!sicher){
+        return;
+    }
+
+    const res = await fetch("/api/admin/delete-employee", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            password: adminPassword,
+            mitarbeiter: name
+        })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+        alert(data.message || "Fehler beim Löschen");
+        return;
+    }
+
+    alert("Mitarbeiter wurde komplett gelöscht ✅");
+    loadStats();
+}
+
 async function loadStats(){
     const filter = document.getElementById("filter").value;
 
@@ -469,14 +523,23 @@ document.getElementById("gesamtProdukte").innerHTML =
         .sort((a,b) => b[1].umsatz - a[1].umsatz);
 
     employeeEntries.forEach(([name, info]) => {
-        employees.innerHTML += \`
-            <tr>
-                <td>\${name}</td>
-                <td>\${info.bestellungen}</td>
-                <td>\${info.umsatz.toFixed(2)}€</td>
-            </tr>
-        \`;
-    });
+    let deleteButton = "";
+
+    if(adminUnlocked){
+        deleteButton =
+            "<button onclick=\"deleteEmployee('" + name.replace(/'/g, "\\'") + "')\">🗑 Löschen</button>";
+    } else {
+        deleteButton = "<span class='small'>Admin nötig</span>";
+    }
+
+    employees.innerHTML +=
+        "<tr>" +
+            "<td>" + name + "</td>" +
+            "<td>" + info.bestellungen + "</td>" +
+            "<td>" + Number(info.umsatz).toLocaleString("de-DE") + " €</td>" +
+            "<td>" + deleteButton + "</td>" +
+        "</tr>";
+});
 
     const products = document.getElementById("products");
     products.innerHTML = "";
@@ -542,6 +605,43 @@ setInterval(() => {
 </body>
 </html>
     `);
+});
+
+app.post("/api/admin/delete-employee", async (req, res) => {
+    try {
+        const { password, mitarbeiter } = req.body;
+
+        if (password !== MANAGER_PASSWORD) {
+            return res.status(403).json({
+                success: false,
+                message: "Falsches Admin-Passwort"
+            });
+        }
+
+        if (!mitarbeiter) {
+            return res.status(400).json({
+                success: false,
+                message: "Mitarbeiter fehlt"
+            });
+        }
+
+        await pool.query(
+            "DELETE FROM orders WHERE mitarbeiter = $1",
+            [mitarbeiter]
+        );
+
+        res.json({
+            success: true,
+            message: "Mitarbeiter wurde komplett gelöscht"
+        });
+
+    } catch (err) {
+        console.error("Fehler beim Löschen:", err);
+        res.status(500).json({
+            success: false,
+            message: "Fehler beim Löschen"
+        });
+    }
 });
 
 app.get("/", (req, res) => {
