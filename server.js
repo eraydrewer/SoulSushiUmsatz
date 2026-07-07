@@ -4,6 +4,7 @@ const XLSX = require("xlsx");
 const { Pool } = require("pg");
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+const BONUS_WEBHOOK_URL = process.env.BONUS_WEBHOOK_URL;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -103,7 +104,7 @@ if (DISCORD_WEBHOOK_URL) {
         `• ${item.name} x${item.menge} = ${item.summe}€`
     ).join("\n");
     
-    await fetch(DISCORD_WEBHOOK_URL, {
+    await fetch(BONUS_WEBHOOK_URL, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
