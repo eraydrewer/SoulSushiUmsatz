@@ -870,13 +870,13 @@ async function sendWeeklyBonusReport() {
             ORDER BY SUM(betrag) DESC
         `);
 
-        if (!DISCORD_WEBHOOK_URL) return;
+       if (!BONUS_WEBHOOK_URL) return;
 
         for (const row of result.rows) {
             const umsatz = Number(row.umsatz || 0);
             const bonus = umsatz * 0.10;
 
-            await fetch(DISCORD_WEBHOOK_URL, {
+           await fetch(BONUS_WEBHOOK_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
