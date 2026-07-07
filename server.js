@@ -776,7 +776,6 @@ loadStock();
 // Danach alle 5 Sekunden aktualisieren
 setInterval(() => {
     loadStats();
-    loadStock();
 }, 5000);
 
 </script>
