@@ -855,8 +855,8 @@ async function sendWeeklyBonusReport() {
             [weekKey]
         );
 
-       if (alreadySent.rows.length > 0) {
-    console.log("Bonus wurde schon gesendet, Test läuft trotzdem weiter ✅");
+      if (alreadySent.rows.length > 0) {
+    return;
 }
 
         const result = await pool.query(`
@@ -945,7 +945,4 @@ setInterval(() => {
 
 app.listen(PORT, () => {
     console.log("Server läuft auf Port " + PORT);
-
-    console.log("Teste Wochenbonus...");
-    sendWeeklyBonusReport();
 });
