@@ -39,14 +39,22 @@ async function initDatabase() {
     `);
 
     await pool.query(`
-        CREATE TABLE IF NOT EXISTS product_stock (
-            id BIGSERIAL PRIMARY KEY,
-            produkt TEXT UNIQUE NOT NULL,
-            bestand INTEGER DEFAULT 0
-        );
-    `);
+    CREATE TABLE IF NOT EXISTS product_stock (
+        id BIGSERIAL PRIMARY KEY,
+        produkt TEXT UNIQUE NOT NULL,
+        bestand INTEGER DEFAULT 0
+    );
+`);
 
-    console.log("Datenbank bereit ✅");
+await pool.query(`
+    CREATE TABLE IF NOT EXISTS bonus_log (
+        id BIGSERIAL PRIMARY KEY,
+        bonus_week TEXT UNIQUE NOT NULL,
+        sent_at TIMESTAMP DEFAULT NOW()
+    );
+`);
+
+console.log("Datenbank bereit ✅");
 }
 
 initDatabase().catch(err => {
@@ -836,6 +844,103 @@ app.post("/api/admin/delete-employee", async (req, res) => {
 app.get("/", (req, res) => {
     res.send("SoulSushi Umsatz Server läuft mit Neon Datenbank ✅");
 });
+
+async function sendWeeklyBonusReport() {
+    try {
+        const weekKey = new Date().toISOString().slice(0, 10);
+
+        const alreadySent = await pool.query(
+            "SELECT * FROM bonus_log WHERE bonus_week = $1",
+            [weekKey]
+        );
+
+        if (alreadySent.rows.length > 0) {
+            return;
+        }
+
+        const result = await pool.query(`
+            SELECT 
+                mitarbeiter,
+                SUM(betrag) AS umsatz,
+                COUNT(*) AS bestellungen
+            FROM orders
+            WHERE datum >= date_trunc('week', NOW())
+            GROUP BY mitarbeiter
+            ORDER BY SUM(betrag) DESC
+        `);
+
+        if (!DISCORD_WEBHOOK_URL) return;
+
+        for (const row of result.rows) {
+            const umsatz = Number(row.umsatz || 0);
+            const bonus = umsatz * 0.10;
+
+            await fetch(DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    embeds: [{
+                        title: "💰 SoulSushi Wochenbonus",
+                        color: 3916970,
+                        fields: [
+                            {
+                                name: "👤 Mitarbeiter",
+                                value: row.mitarbeiter,
+                                inline: true
+                            },
+                            {
+                                name: "📊 Wochenumsatz",
+                                value: umsatz.toLocaleString("de-DE") + "€",
+                                inline: true
+                            },
+                            {
+                                name: "🎁 Bonus 10%",
+                                value: bonus.toLocaleString("de-DE") + "€",
+                                inline: true
+                            },
+                            {
+                                name: "📦 Bestellungen",
+                                value: String(row.bestellungen),
+                                inline: true
+                            }
+                        ],
+                        timestamp: new Date().toISOString()
+                    }]
+                })
+            });
+        }
+
+        await pool.query(
+            "INSERT INTO bonus_log (bonus_week) VALUES ($1)",
+            [weekKey]
+        );
+
+        console.log("Wochenbonus wurde gesendet ✅");
+
+    } catch (err) {
+        console.error("Fehler beim Wochenbonus:", err);
+    }
+}
+
+setInterval(() => {
+
+    const berlinTime = new Intl.DateTimeFormat("de-DE", {
+        timeZone: "Europe/Berlin",
+        weekday: "long",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(new Date());
+
+    if (
+        berlinTime.includes("Sonntag") &&
+        berlinTime.includes("12:00")
+    ) {
+        sendWeeklyBonusReport();
+    }
+
+}, 60000);
 
 app.listen(PORT, () => {
     console.log("Server läuft auf Port " + PORT);
