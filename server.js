@@ -669,20 +669,6 @@ async function saveStockDirect(produkt){
     loadStock();
 }
 
-    const data = await res.json();
-
-    if(!res.ok){
-        alert(data.message || "Fehler beim Speichern");
-        return;
-    }
-
-    document.getElementById("stockProdukt").value = "";
-    document.getElementById("stockBestand").value = "";
-
-    alert("Bestand gespeichert ✅");
-    loadStock();
-}
-
 async function loadStats(){
     const filter = document.getElementById("filter").value;
 
