@@ -26,6 +26,7 @@ const pool = new Pool({
 });
 
 async function initDatabase() {
+
     await pool.query(`
         CREATE TABLE IF NOT EXISTS orders (
             id BIGSERIAL PRIMARY KEY,
@@ -34,6 +35,14 @@ async function initDatabase() {
             rabatt NUMERIC DEFAULT 0,
             bestellung JSONB DEFAULT '[]',
             datum TIMESTAMP DEFAULT NOW()
+        );
+    `);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS product_stock (
+            id BIGSERIAL PRIMARY KEY,
+            produkt TEXT UNIQUE NOT NULL,
+            bestand INTEGER DEFAULT 0
         );
     `);
 
@@ -56,17 +65,29 @@ app.post("/order", async (req, res) => {
         }
 
         await pool.query(
-            `INSERT INTO orders (mitarbeiter, betrag, rabatt, bestellung, datum)
-             VALUES ($1, $2, $3, $4, NOW())`,
-            [
-                mitarbeiter,
-                Number(betrag),
-                Number(rabatt || 0),
-                JSON.stringify(bestellung || [])
-            ]
-        );
+    `INSERT INTO orders (mitarbeiter, betrag, rabatt, bestellung, datum)
+     VALUES ($1, $2, $3, $4, NOW())`,
+    [
+        mitarbeiter,
+        Number(betrag),
+        Number(rabatt || 0),
+        JSON.stringify(bestellung || [])
+    ]
+);
 
-        console.log("Neue Bestellung gespeichert:", mitarbeiter, betrag);
+for (const item of (bestellung || [])) {
+    await pool.query(
+        `UPDATE product_stock
+         SET bestand = GREATEST(bestand - $1, 0)
+         WHERE produkt = $2`,
+        [
+            Number(item.menge || 0),
+            item.name
+        ]
+    );
+}
+
+console.log("Neue Bestellung gespeichert:", mitarbeiter, betrag);
 
 if (DISCORD_WEBHOOK_URL) {
 
@@ -207,6 +228,68 @@ app.get("/api/stats", async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Fehler beim Laden der Statistiken"
+        });
+    }
+});
+
+app.get("/api/stock", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT produkt, bestand
+            FROM product_stock
+            ORDER BY produkt ASC
+        `);
+
+        res.json(result.rows);
+
+    } catch (err) {
+        console.error("Fehler beim Laden vom Bestand:", err);
+        res.status(500).json({
+            success: false,
+            message: "Fehler beim Laden vom Bestand"
+        });
+    }
+});
+
+app.post("/api/admin/set-stock", async (req, res) => {
+    try {
+        const { password, produkt, bestand } = req.body;
+
+        if (password !== MANAGER_PASSWORD) {
+            return res.status(403).json({
+                success: false,
+                message: "Falsches Admin-Passwort"
+            });
+        }
+
+        if (!produkt) {
+            return res.status(400).json({
+                success: false,
+                message: "Produkt fehlt"
+            });
+        }
+
+        await pool.query(
+            `INSERT INTO product_stock (produkt, bestand)
+             VALUES ($1, $2)
+             ON CONFLICT (produkt)
+             DO UPDATE SET bestand = EXCLUDED.bestand`,
+            [
+                produkt,
+                Number(bestand || 0)
+            ]
+        );
+
+        res.json({
+            success: true,
+            message: "Bestand gespeichert"
+        });
+
+    } catch (err) {
+        console.error("Fehler beim Speichern vom Bestand:", err);
+        res.status(500).json({
+            success: false,
+            message: "Fehler beim Speichern vom Bestand"
         });
     }
 });
