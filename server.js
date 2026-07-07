@@ -474,6 +474,24 @@ td, th{
 </div>
 
 <div class="box">
+    <h2>📦 Bestand verwalten</h2>
+
+    <input id="stockProdukt" placeholder="Produktname z.B. Cola">
+    <input id="stockBestand" type="number" placeholder="Bestand z.B. 100">
+    <button onclick="saveStock()">Bestand speichern</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produkt</th>
+                <th>Aktueller Bestand</th>
+            </tr>
+        </thead>
+        <tbody id="stockList"></tbody>
+    </table>
+</div>
+
+<div class="box">
     <h2>Mitarbeiter Umsatz</h2>
     <table>
         <thead>
@@ -573,6 +591,67 @@ async function deleteEmployee(name){
 
     alert("Mitarbeiter wurde komplett gelöscht ✅");
     loadStats();
+}
+
+async function loadStock(){
+    const res = await fetch("/api/stock");
+
+    if(!res.ok){
+        return;
+    }
+
+    const stock = await res.json();
+    const stockList = document.getElementById("stockList");
+
+    stockList.innerHTML = "";
+
+    stock.forEach(item => {
+        stockList.innerHTML +=
+            "<tr>" +
+                "<td>" + item.produkt + "</td>" +
+                "<td>" + item.bestand + "x</td>" +
+            "</tr>";
+    });
+}
+
+async function saveStock(){
+    if(!adminUnlocked){
+        alert("Bitte zuerst Admin-Bereich öffnen.");
+        return;
+    }
+
+    const produkt = document.getElementById("stockProdukt").value.trim();
+    const bestand = document.getElementById("stockBestand").value;
+
+    if(!produkt){
+        alert("Bitte Produktname eingeben.");
+        return;
+    }
+
+    const res = await fetch("/api/admin/set-stock", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            password: adminPassword,
+            produkt: produkt,
+            bestand: bestand
+        })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+        alert(data.message || "Fehler beim Speichern");
+        return;
+    }
+
+    document.getElementById("stockProdukt").value = "";
+    document.getElementById("stockBestand").value = "";
+
+    alert("Bestand gespeichert ✅");
+    loadStock();
 }
 
 async function loadStats(){
@@ -676,10 +755,12 @@ function exportExcel(){
 
 // Direkt beim Öffnen laden
 loadStats();
+loadStock();
 
 // Danach alle 5 Sekunden aktualisieren
 setInterval(() => {
     loadStats();
+    loadStock();
 }, 5000);
 
 </script>
