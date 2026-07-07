@@ -526,12 +526,11 @@ document.getElementById("gesamtProdukte").innerHTML =
     let deleteButton = "";
 
     if(adminUnlocked){
-        deleteButton =
-            "<button onclick=\"deleteEmployee('" + name.replace(/'/g, "\\'") + "')\">🗑 Löschen</button>";
-    } else {
-        deleteButton = "<span class='small'>Admin nötig</span>";
-    }
-
+    deleteButton =
+        "<button onclick='deleteEmployee(" + JSON.stringify(name) + ")'>🗑 Löschen</button>";
+} else {
+    deleteButton = "<span class='small'>Admin nötig</span>";
+}
     employees.innerHTML +=
         "<tr>" +
             "<td>" + name + "</td>" +
