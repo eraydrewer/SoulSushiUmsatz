@@ -776,6 +776,17 @@ loadStock();
 // Danach alle 5 Sekunden aktualisieren
 setInterval(() => {
     loadStats();
+
+    const active = document.activeElement;
+
+    if (
+        !active ||
+        !active.id ||
+        !active.id.startsWith("stock_")
+    ) {
+        loadStock();
+    }
+
 }, 5000);
 
 </script>
