@@ -945,4 +945,7 @@ setInterval(() => {
 
 app.listen(PORT, () => {
     console.log("Server läuft auf Port " + PORT);
+
+    console.log("Teste Wochenbonus...");
+    sendWeeklyBonusReport();
 });
