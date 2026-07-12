@@ -954,7 +954,7 @@ setInterval(() => {
 
     if (
         berlinTime.includes("Sonntag") &&
-        (berlinTime.includes("15:50") ||
+        (berlinTime.includes("12.00") ||
          berlinTime.includes("12:01") ||
          berlinTime.includes("12:02") ||
          berlinTime.includes("12:03") ||
