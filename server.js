@@ -855,8 +855,12 @@ async function sendWeeklyBonusReport() {
             [weekKey]
         );
 
-      if (alreadySent.rows.length > 0) {
-    return;
+     if (alreadySent.rows.length > 0) {
+    console.log("Bonusbericht wurde diese Woche bereits gesendet.");
+
+    return {
+        alreadySent: true
+    };
 }
 
         const result = await pool.query(`
@@ -920,9 +924,15 @@ async function sendWeeklyBonusReport() {
 
         console.log("Wochenbonus wurde gesendet ✅");
 
-    } catch (err) {
-        console.error("Fehler beim Wochenbonus:", err);
-    }
+return {
+    alreadySent: false,
+    employees: result.rows.length
+};
+
+} catch (err) {
+    console.error("Fehler beim Wochenbonus:", err);
+    throw err;
+}
 }
 
   app.get("/wake-up", (req, res) => {
@@ -935,15 +945,27 @@ app.get("/weekly-bonus", async (req, res) => {
     try {
         console.log("Bonusbericht wurde durch cron-job.org gestartet.");
 
-        await sendWeeklyBonusReport();
+        const result = await sendWeeklyBonusReport();
+
+        if (result.alreadySent) {
+            return res.status(200).send(
+                "Bonusbericht wurde für diese Woche bereits gesendet."
+            );
+        }
 
         console.log("Bonusbericht wurde erfolgreich an Discord gesendet.");
 
-        res.status(200).send("Bonusbericht wurde erfolgreich gesendet.");
+        res.status(200).send(
+            "Bonusbericht wurde erfolgreich gesendet. Mitarbeiter: " +
+            result.employees
+        );
+
     } catch (error) {
         console.error("Fehler beim Bonusbericht:", error);
 
-        res.status(500).send("Fehler beim Bonusbericht.");
+        res.status(500).send(
+            "Fehler beim Bonusbericht: " + error.message
+        );
     }
 });
 
