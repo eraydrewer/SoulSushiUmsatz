@@ -980,6 +980,22 @@ app.get("/wake-up", (req, res) => {
     res.status(200).send("SoulSushi Server ist wach.");
 });
 
+app.get("/weekly-bonus", async (req, res) => {
+    try {
+        console.log("Bonusbericht wurde durch cron-job.org gestartet.");
+
+        await sendWeeklyBonusReport();
+
+        console.log("Bonusbericht wurde erfolgreich an Discord gesendet.");
+
+        res.status(200).send("Bonusbericht wurde erfolgreich gesendet.");
+    } catch (error) {
+        console.error("Fehler beim Bonusbericht:", error);
+
+        res.status(500).send("Fehler beim Bonusbericht.");
+    }
+});
+
 app.listen(PORT, () => {
     console.log("Server läuft auf Port " + PORT);
 });
