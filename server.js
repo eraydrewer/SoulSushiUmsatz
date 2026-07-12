@@ -974,6 +974,12 @@ setInterval(() => {
 
 }, 60000);
 
+app.get("/wake-up", (req, res) => {
+    console.log("Server wurde durch cron-job.org aufgeweckt.");
+
+    res.status(200).send("SoulSushi Server ist wach.");
+});
+
 app.listen(PORT, () => {
     console.log("Server läuft auf Port " + PORT);
 });
