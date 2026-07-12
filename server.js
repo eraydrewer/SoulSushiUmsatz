@@ -934,47 +934,7 @@ setInterval(() => {
         minute: "2-digit"
     }).format(new Date());
 
-   let bonusHeuteGesendet = false;
-
-setInterval(() => {
-
-    const jetzt = new Date();
-
-    const formatter = new Intl.DateTimeFormat("de-DE", {
-        timeZone: "Europe/Berlin",
-        weekday: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-    });
-
-    const berlinTime = formatter.format(jetzt);
-
-    console.log(berlinTime);
-
-    if (
-        berlinTime.includes("Sonntag") &&
-        (berlinTime.includes("12.00") ||
-         berlinTime.includes("12:01") ||
-         berlinTime.includes("12:02") ||
-         berlinTime.includes("12:03") ||
-         berlinTime.includes("12:04") ||
-         berlinTime.includes("12:05")) &&
-        !bonusHeuteGesendet
-    ) {
-        bonusHeuteGesendet = true;
-        sendWeeklyBonusReport();
-    }
-
-    if (!berlinTime.includes("Sonntag")) {
-        bonusHeuteGesendet = false;
-    }
-
-}, 60000);
-
-}, 60000);
-
-app.get("/wake-up", (req, res) => {
+  app.get("/wake-up", (req, res) => {
     console.log("Server wurde durch cron-job.org aufgeweckt.");
 
     res.status(200).send("SoulSushi Server ist wach.");
