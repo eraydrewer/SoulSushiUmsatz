@@ -925,15 +925,6 @@ async function sendWeeklyBonusReport() {
     }
 }
 
-setInterval(() => {
-
-    const berlinTime = new Intl.DateTimeFormat("de-DE", {
-        timeZone: "Europe/Berlin",
-        weekday: "long",
-        hour: "2-digit",
-        minute: "2-digit"
-    }).format(new Date());
-
   app.get("/wake-up", (req, res) => {
     console.log("Server wurde durch cron-job.org aufgeweckt.");
 
