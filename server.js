@@ -269,8 +269,7 @@ app.get("/api/stock", async (req, res) => {
 
 app.post("/api/admin/set-stock", async (req, res) => {
     try {
-         { password, produkt, bestand } = req.body;
-
+        const { password, produkt, bestand } = req.body;
         if (password !== MANAGER_PASSWORD) {
             return res.status(403).json({
                 success: false,
