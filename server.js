@@ -64,7 +64,7 @@ initDatabase().catch(err => {
 
 app.post("/order", async (req, res) => {
     try {
-        const { mitarbeiter, betrag, rabatt, bestellung } = req.body;
+         { mitarbeiter, betrag, rabatt, bestellung } = req.body;
 
         if (!mitarbeiter || betrag === undefined) {
             return res.status(400).json({
@@ -84,7 +84,7 @@ app.post("/order", async (req, res) => {
     ]
 );
 
-for (const item of (bestellung || [])) {
+for ( item of (bestellung || [])) {
     await pool.query(
         `UPDATE product_stock
          SET bestand = GREATEST(bestand - $1, 0)
@@ -100,7 +100,7 @@ console.log("Neue Bestellung gespeichert:", mitarbeiter, betrag);
 
 if (DISCORD_WEBHOOK_URL) {
 
-    const text = (bestellung || []).map(item =>
+     text = (bestellung || []).map(item =>
         `• ${item.name} x${item.menge} = ${item.summe}€`
     ).join("\n");
     
@@ -166,9 +166,9 @@ function getFilterSQL(filter) {
 }
 
 async function getOrders(filter) {
-    const filterSQL = getFilterSQL(filter);
+     filterSQL = getFilterSQL(filter);
 
-    const result = await pool.query(`
+     result = await pool.query(`
         SELECT *
         FROM orders
         ${filterSQL}
@@ -179,12 +179,12 @@ async function getOrders(filter) {
 }
 
 function buildStats(orders) {
-    let totalRevenue = 17337095;
-    const employees = {};
-    const products = {};
+    let totalRevenue = 0;
+     employees = {};
+     products = {};
 
     orders.forEach(order => {
-        const betrag = Number(order.betrag) || 0;
+         betrag = Number(order.betrag) || 0;
         totalRevenue += betrag;
 
         if (!employees[order.mitarbeiter]) {
@@ -197,7 +197,7 @@ function buildStats(orders) {
         employees[order.mitarbeiter].umsatz += betrag;
         employees[order.mitarbeiter].bestellungen++;
 
-        const bestellung = Array.isArray(order.bestellung)
+         bestellung = Array.isArray(order.bestellung)
             ? order.bestellung
             : [];
 
@@ -226,11 +226,18 @@ function buildStats(orders) {
 }
 
 app.get("/api/stats", async (req, res) => {
-    try {
-        const filter = req.query.filter || "day";
+   try {
+    const filter = req.query.filter || "day";
 
-        const orders = await getOrders(filter);
-        res.json(buildStats(orders));
+    const orders = await getOrders(filter);
+
+    const stats = buildStats(orders);
+
+    if (filter === "all") {
+        stats.totalRevenue += 17337095;
+    }
+
+    res.json(stats);
 
     } catch (err) {
         console.error("Fehler bei Statistiken:", err);
@@ -243,7 +250,7 @@ app.get("/api/stats", async (req, res) => {
 
 app.get("/api/stock", async (req, res) => {
     try {
-        const result = await pool.query(`
+         result = await pool.query(`
             SELECT produkt, bestand
             FROM product_stock
             ORDER BY produkt ASC
@@ -262,7 +269,7 @@ app.get("/api/stock", async (req, res) => {
 
 app.post("/api/admin/set-stock", async (req, res) => {
     try {
-        const { password, produkt, bestand } = req.body;
+         { password, produkt, bestand } = req.body;
 
         if (password !== MANAGER_PASSWORD) {
             return res.status(403).json({
@@ -305,13 +312,13 @@ app.post("/api/admin/set-stock", async (req, res) => {
 
 app.get("/export-excel", async (req, res) => {
     try {
-        const filter = req.query.filter || "all";
+         filter = req.query.filter || "all";
        
-        const orders = await getOrders(filter);
-        const rows = [];
+         orders = await getOrders(filter);
+         rows = [];
 
         orders.forEach(order => {
-            const bestellung = Array.isArray(order.bestellung)
+             bestellung = Array.isArray(order.bestellung)
                 ? order.bestellung
                 : [];
 
@@ -329,12 +336,12 @@ app.get("/export-excel", async (req, res) => {
             });
         });
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(rows);
+         wb = XLSX.utils.book_new();
+         ws = XLSX.utils.json_to_sheet(rows);
 
         XLSX.utils.book_append_sheet(wb, ws, "SoulSushi Umsatz");
 
-        const buffer = XLSX.write(wb, {
+         buffer = XLSX.write(wb, {
             type: "buffer",
             bookType: "xlsx"
         });
@@ -553,7 +560,7 @@ let adminUnlocked = false;
 let adminPassword = "";
 
 function openAdmin(){
-    const pw = prompt("Admin-Passwort eingeben:");
+     pw = prompt("Admin-Passwort eingeben:");
 
     if(!pw){
         return;
@@ -572,13 +579,13 @@ async function deleteEmployee(name){
         return;
     }
 
-    const sicher = confirm("Mitarbeiter " + name + " wirklich komplett löschen? Alle Umsätze und Bestellungen werden gelöscht!");
+     sicher = confirm("Mitarbeiter " + name + " wirklich komplett löschen? Alle Umsätze und Bestellungen werden gelöscht!");
 
     if(!sicher){
         return;
     }
 
-    const res = await fetch("/api/admin/delete-employee", {
+     res = await fetch("/api/admin/delete-employee", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -589,7 +596,7 @@ async function deleteEmployee(name){
         })
     });
 
-    const data = await res.json();
+     data = await res.json();
 
     if(!res.ok){
         alert(data.message || "Fehler beim Löschen");
