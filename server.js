@@ -64,7 +64,7 @@ initDatabase().catch(err => {
 
 app.post("/order", async (req, res) => {
     try {
-         { mitarbeiter, betrag, rabatt, bestellung } = req.body;
+         const { mitarbeiter, betrag, rabatt, bestellung } = req.body;
 
         if (!mitarbeiter || betrag === undefined) {
             return res.status(400).json({
