@@ -452,7 +452,7 @@ td, th{
 </head>
 <body>
 
-<h1>🍣 SoulSushi Management Dashboard</h1>
+<h1>SoulSushi Management Dashboard</h1>
 
 <div class="box">
     <select id="filter">
